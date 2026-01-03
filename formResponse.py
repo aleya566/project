@@ -86,15 +86,6 @@ gpa_order = sorted(df['GPA'].unique())
 
 # 2. Create the Plotly Box Plot
 
-show_points = st.checkbox("Show individual student data points")
-
-if show_points:
-    fig3.update_traces(boxpoints="all")
-else:
-    fig3.update_traces(boxpoints="outliers")
-
-st.plotly_chart(fig3, use_container_width=True)
-
 fig3 = px.box(
     df,
     x="GPA",
