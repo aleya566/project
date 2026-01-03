@@ -107,3 +107,49 @@ fig3.update_layout(
 
 # 4. Display in Streamlit
 st.plotly_chart(fig3, use_container_width=True)
+
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+
+# 1. Define the ordering logic
+assignment_impact_order = ['No impact', 'Minor impact', 'Moderate impact', 'Major impact', 'Severe impact']
+insomnia_category_order = ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia']
+
+# 2. Prepare the data (Crosstab to Melted format)
+assignment_table = pd.crosstab(
+    df["Insomnia_Category"], 
+    df["AssignmentImpact"],
+    dropna=False
+)
+assignment_melted = assignment_table.reset_index().melt(
+    id_vars='Insomnia_Category', 
+    var_name='AssignmentImpact', 
+    value_name='Student_Count'
+)
+
+# 3. Create the Plotly Stacked Bar Chart
+fig4 = px.bar(
+    assignment_melted,
+    x='Insomnia_Category',
+    y='Student_Count',
+    color='AssignmentImpact',
+    title="Assignment Impact by Insomnia Category",
+    category_orders={
+        "AssignmentImpact": assignment_impact_order,
+        "Insomnia_Category": insomnia_category_order
+    },
+    color_discrete_sequence=px.colors.sequential.Sunset, # Closest match to 'flare'
+    labels={'Student_Count': 'Number of Students', 'Insomnia_Category': 'Insomnia Level'}
+)
+
+# 4. Refine layout (matches your plt.legend logic)
+fig4.update_layout(
+    barmode='stack', # This ensures the bars are stacked
+    xaxis_title="Insomnia Category",
+    yaxis_title="Number of Students",
+    legend_title_text='Assignment Impact'
+)
+
+# 5. Display in Streamlit
+st.plotly_chart(fig4, use_container_width=True)
