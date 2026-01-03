@@ -94,3 +94,34 @@ fig2.update_layout(
 
 # 4. Display in Streamlit
 st.plotly_chart(fig2, use_container_width=True)
+
+
+import streamlit as st
+import plotly.express as px
+
+# 1. Define the GPA order (if your GPA column contains categories like '2.0-2.5', etc.)
+# If GPA is a number, you can skip the 'category_orders' part.
+gpa_order = sorted(df['GPA'].unique()) 
+
+# 2. Create the Plotly Box Plot
+fig3 = px.box(
+    df,
+    x="GPA",
+    y="InsomniaSeverity_index",
+    color="GPA", # Gives each box a different color from the palette
+    title="Insomnia Severity Index Across GPA Categories",
+    category_orders={"GPA": gpa_order},
+    color_discrete_sequence=px.colors.sequential.Sunset, # Matches 'flare'
+    points="outliers" # Show outliers specifically (default) or use "all"
+)
+
+# 3. Clean up labels and layout
+fig3.update_layout(
+    xaxis_title="GPA Category",
+    yaxis_title="Insomnia Severity Index",
+    showlegend=False, # Hide legend since the X-axis already identifies the GPA
+    plot_bgcolor="rgba(0,0,0,0)" # Transparent background for a cleaner look
+)
+
+# 4. Display in Streamlit
+st.plotly_chart(fig3, use_container_width=True)
