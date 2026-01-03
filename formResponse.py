@@ -176,39 +176,42 @@ import streamlit as st
 import plotly.express as px
 import pandas as pd
 
-# 1. Tetapkan susunan kategori yang anda mahukan
+# 1. Takrifkan susunan kategori yang tepat
 academic_order = ['Below Average', 'Average', 'Good', 'Very Good', 'Excellent']
+insomnia_order = ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia']
 
-# 2. Tukar kolum AcademicPerformance menjadi Categorical dengan susunan tersebut
+# 2. Tukar data kepada jenis Categorical supaya urutan kekal konsisten
 df['AcademicPerformance'] = pd.Categorical(
     df['AcademicPerformance'], 
     categories=academic_order, 
     ordered=True
 )
 
-# 3. Bina Plotly Boxplot
+# 3. Bina Boxplot menggunakan Plotly Express
 fig6 = px.box(
     df,
     x='Insomnia_Category',
     y='AcademicPerformance',
     color='Insomnia_Category',
-    title="Academic Performance by Insomnia Severity",
+    title="Academic Performance vs Insomnia Severity",
+    # Gunakan category_orders untuk memaksa susunan pada paksi
     category_orders={
-        "AcademicPerformance": academic_order, # Paksi-Y ikut susunan ini
-        "Insomnia_Category": ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia'] # Paksi-X
+        "AcademicPerformance": academic_order,
+        "Insomnia_Category": insomnia_order
     },
-    color_discrete_sequence=px.colors.sequential.Sunset,
-    points="outliers"
+    color_discrete_sequence=px.colors.sequential.Sunset, # Warna mirip 'flare'
+    points="outliers" # Tunjukkan titik bagi data pencilan
 )
 
-# 4. Kemaskan paparan
+# 4. Kemaskan label paksi
 fig6.update_layout(
-    yaxis_title="Academic Performance",
     xaxis_title="Insomnia Severity",
-    showlegend=False
+    yaxis_title="Academic Performance (Self-rated)",
+    showlegend=False,
+    yaxis=dict(type='category') # Memastikan paksi-Y melayan data sebagai kategori
 )
 
-# 5. Papar di Streamlit
+# 5. Paparkan dalam Streamlit
 st.plotly_chart(fig6, use_container_width=True)
 
 # Select columns and calculate matrix
