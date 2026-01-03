@@ -215,6 +215,53 @@ fig.update_layout(
 
 st.plotly_chart(fig, use_container_width=True)
 
+
+
+
+
+import streamlit as st
+import plotly.express as px
+
+# 1. Susunan kategori (ikut urutan Colab anda: Below average di atas)
+academic_order = ['Below average', 'Average', 'Good', 'Very good', 'Excellent']
+insomnia_order = ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia']
+
+# 2. Bina Boxplot
+fig6 = px.box(
+    df,
+    x='Insomnia_Category',
+    y='AcademicPerformance',
+    color='Insomnia_Category', # Memberi warna solid pada kotak
+    title="Academic Performance by Insomnia Severity",
+    category_orders={
+        "AcademicPerformance": academic_order,
+        "Insomnia_Category": insomnia_order
+    },
+    # Gunakan palet warna yang lebih dekat dengan Seaborn 'flare'
+    color_discrete_sequence=px.colors.sequential.RdPu_r, 
+    points="outliers"
+)
+
+# 3. Penyelarasan Layout (Kritikal untuk rupa yang sama)
+fig6.update_layout(
+    xaxis_title="Insomnia Severity",
+    yaxis_title="Academic Performance (GPA / Self-rated)",
+    showlegend=False,
+    # Mengecilkan lebar kotak supaya ada ruang di antara mereka
+    boxgap=0.5, 
+    # Memastikan paksi Y tidak terbalik secara automatik
+    yaxis=dict(autorange="reversed") if df['AcademicPerformance'].iloc[0] == 'Excellent' else None
+)
+
+# 4. Tambah garisan kotak yang lebih jelas
+fig6.update_traces(marker_size=4, line_width=2)
+
+st.plotly_chart(fig6, use_container_width=True)
+
+
+
+
+
 # Select columns and calculate matrix
 corr_columns = [
     'SleepHours_est', 'InsomniaSeverity_index', 'DaytimeFatigue_numeric',
