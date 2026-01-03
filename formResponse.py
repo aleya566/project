@@ -176,43 +176,44 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# 1. Tentukan susunan yang dikehendaki (bawah ke atas)
-academic_order = ['Below Average', 'Average', 'Good', 'Very Good', 'Excellent']
+# 1. Pastikan urutan kategori adalah tepat (Excellent di atas, Below Average di bawah)
+# Kita susun begini supaya dalam graf, Excellent berada di kedudukan tertinggi paksi-Y
+academic_order = ['Below average', 'Average', 'Good', 'Very good', 'Excellent']
 insomnia_order = ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia']
 
-# 2. Tukar data kepada kategori supaya Pandas faham susunannya
+# 2. Tukar data kepada kategori (Penting untuk susunan paksi)
 df['AcademicPerformance'] = pd.Categorical(
     df['AcademicPerformance'], 
     categories=academic_order, 
     ordered=True
 )
 
-# 3. Bina Boxplot menggunakan Plotly
-fig6 = px.box(
+# 3. Gunakan px.box (BUKAN px.histogram atau px.bar)
+fig = px.box(
     df,
     x='Insomnia_Category',
     y='AcademicPerformance',
     color='Insomnia_Category',
     title="Academic Performance by Insomnia Severity",
-    # category_orders memastikan Plotly mengikut susunan kita, bukan susunan abjad
+    # category_orders memastikan Excellent di atas dan Below Average di bawah
     category_orders={
         "AcademicPerformance": academic_order,
         "Insomnia_Category": insomnia_order
     },
-    color_discrete_sequence=px.colors.sequential.Sunset, # Warna seakan 'flare'
-    points="outliers" # Menunjukkan titik bagi data ekstrem
+    color_discrete_sequence=px.colors.sequential.Sunset,
+    points="outliers" 
 )
 
-# 4. Kemaskan label paksi
-fig6.update_layout(
+# 4. Laraskan Layout supaya serupa dengan Colab
+fig.update_layout(
     xaxis_title="Insomnia Severity",
-    yaxis_title="Academic Performance (Self-rated)",
+    yaxis_title="Academic Performance (GPA / Self-rated)",
     showlegend=False,
-    yaxis=dict(type='category') # Memastikan paksi-Y melayan teks sebagai kategori
+    # Memaksa paksi-Y mengikut urutan kategori yang kita tetapkan
+    yaxis=dict(autorange="reversed") 
 )
 
-# 5. Paparkan di Streamlit
-st.plotly_chart(fig6, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 # Select columns and calculate matrix
 corr_columns = [
