@@ -62,32 +62,32 @@ perf_impact = severe_insomnia_df['AcademicPerformance'].mode()[0] if not severe_
 # D. Assignment Risk (Percentage reporting Major/Severe impact)
 assign_impact = (severe_insomnia_df['AssignmentImpact'].isin(['Major impact', 'Severe impact']).mean() * 100)
 
-# Display metrics in cards
+# Display key academic impact metrics
 col1.metric(
-    label="🧠 Concentration Risk", 
-    value=f"{focus_risk:.1f}%", 
-    help="Severe insomniacs who struggle to focus often/always",
+    label="🧠 Concentration Difficulty",
+    value=f"{focus_risk:.1f}%",
+    help="Percentage of students with severe insomnia who report frequent difficulty concentrating",
     border=True
-) 
+)
 
 col2.metric(
-    label="😫 Extreme Fatigue", 
-    value=f"{fatigue_impact:.1f}%", 
-    help="Severe insomniacs reporting frequent daytime fatigue",
+    label="😫 Severe Academic Fatigue",
+    value=f"{fatigue_impact:.1f}%",
+    help="Percentage of students with severe insomnia experiencing frequent daytime fatigue",
     border=True
-) 
+)
 
 col3.metric(
-    label="📉 Performance Trend", 
-    value=perf_impact, 
-    help="Most common academic performance level for students with severe insomnia",
+    label="📉 Academic Performance Level",
+    value=perf_impact,
+    help="Most frequently reported academic performance category among students with severe insomnia",
     border=True
-) 
+)
 
-col4.metric( 
-    label="📝 Assignment Risk", 
-    value=f"{assign_impact:.1f}%", 
-    help="Severe insomniacs reporting major/severe impact on assignments",
+col4.metric(
+    label="📝 Assignment Performance Risk",
+    value=f"{assign_impact:.1f}%",
+    help="Percentage of students with severe insomnia reporting major or severe difficulty completing assignments",
     border=True
 )
 
