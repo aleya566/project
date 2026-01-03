@@ -3,241 +3,139 @@ import pandas as pd
 import plotly.express as px
 import numpy as np
 
-# --- Streamlit Page Config ---
-st.set_page_config(page_title="Exploration Dashboard: Academic Stress and Sleep Patterns Among Students", layout="wide")
+# ==========================================
+# 1. PAGE CONFIGURATION
+# ==========================================
+st.set_page_config(
+    page_title="Exploration Dashboard: Academic Stress and Sleep Patterns", 
+    layout="wide"
+)
 
-# --- Load Data ---
+# ==========================================
+# 2. DATA LOADING & PRE-PROCESSING
+# ==========================================
 @st.cache_data
 def load_data():
     url = 'https://raw.githubusercontent.com/aleya566/project/refs/heads/main/final_processed_data%20(8).csv'
     df = pd.read_csv(url)
-    return df
+    
+    # Define global category orders for consistency
+    academic_order = ['Below average', 'Average', 'Good', 'Very good', 'Excellent']
+    insomnia_order = ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia']
+    frequency_order = ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
+    impact_order = ['No impact', 'Minor impact', 'Moderate impact', 'Major impact', 'Severe impact']
+    
+    # Apply categorical ordering to the dataframe
+    df['AcademicPerformance'] = pd.Categorical(df['AcademicPerformance'], categories=academic_order, ordered=True)
+    df['Insomnia_Category'] = pd.Categorical(df['Insomnia_Category'], categories=insomnia_order, ordered=True)
+    df['ConcentrationDifficulty'] = pd.Categorical(df['ConcentrationDifficulty'], categories=frequency_order, ordered=True)
+    df['AssignmentImpact'] = pd.Categorical(df['AssignmentImpact'], categories=impact_order, ordered=True)
+    df['DaytimeFatigue'] = pd.Categorical(df['DaytimeFatigue'], categories=frequency_order, ordered=True)
+    
+    return df, academic_order, insomnia_order, frequency_order, impact_order
 
-df = load_data()
-# Title for the Streamlit App
-st.title("Student Health Analysis")
+df, academic_order, insomnia_order, frequency_order, impact_order = load_data()
 
+# ==========================================
+# 3. HEADER & NAVIGATION STRUCTURE
+# ==========================================
+st.title("📊 Student Health & Academic Analysis")
+st.markdown("Exploring the relationship between sleep quality (Insomnia) and academic outcomes.")
 
+# Using Tabs to keep the dashboard organized and scannable
+tab1, tab2, tab3 = st.tabs(["📉 Academic Analysis", "😴 Sleep & Fatigue Patterns", "🔗 Overall Correlations"])
 
+# ==========================================
+# TAB 1: ACADEMIC ANALYSIS
+# ==========================================
+with tab1:
+    col1, col2 = st.columns(2)
 
-import streamlit as st
-import pandas as pd
-import plotly.express as px
+    with col1:
+        # Box Plot: Academic Performance vs Insomnia
+        fig_ac = px.box(
+            df, x='Insomnia_Category', y='AcademicPerformance', color='Insomnia_Category',
+            title="Academic Performance by Insomnia Severity",
+            category_orders={"AcademicPerformance": academic_order, "Insomnia_Category": insomnia_order},
+            color_discrete_sequence=px.colors.sequential.Sunset,
+            points="outliers"
+        )
+        # Use reversed autorange so 'Excellent' stays at the top of the Y-axis
+        fig_ac.update_layout(yaxis=dict(autorange="reversed"), showlegend=False)
+        st.plotly_chart(fig_ac, use_container_width=True)
 
-# 1. Prepare the Data (Ensure categories are ordered)
-concentration_difficulty_order = ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
-insomnia_category_order = ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia']
+    with col2:
+        # Box Plot: Insomnia Index vs GPA
+        gpa_order = sorted(df['GPA'].unique())
+        fig_gpa = px.box(
+            df, x="GPA", y="InsomniaSeverity_index", color="GPA",
+            title="Insomnia Severity Index Across GPA Categories",
+            category_orders={"GPA": gpa_order},
+            color_discrete_sequence=px.colors.sequential.Sunset,
+            points="outliers"
+        )
+        fig_gpa.update_layout(showlegend=False)
+        st.plotly_chart(fig_gpa, use_container_width=True)
 
-df['ConcentrationDifficulty'] = pd.Categorical(
-    df['ConcentrationDifficulty'], 
-    categories=concentration_difficulty_order, 
-    ordered=True
-)
-df['Insomnia_Category'] = pd.Categorical(
-    df['Insomnia_Category'], 
-    categories=insomnia_category_order, 
-    ordered=True
-)
+# ==========================================
+# TAB 2: SLEEP & FATIGUE PATTERNS
+# ==========================================
+with tab2:
+    col3, col4 = st.columns(2)
 
-# 2. Create the Cross-tab and Melt (Just like your original code)
-concentration_crosstab = pd.crosstab(
-    df['Insomnia_Category'], 
-    df['ConcentrationDifficulty'], 
-    dropna=False
-)
-concentration_melted = concentration_crosstab.reset_index().melt(
-    id_vars='Insomnia_Category', 
-    var_name='ConcentrationDifficulty', 
-    value_name='Count'
-)
+    with col3:
+        # Grouped Bar: Concentration Difficulty
+        conc_data = pd.crosstab(df['Insomnia_Category'], df['ConcentrationDifficulty'], dropna=False).reset_index().melt(id_vars='Insomnia_Category')
+        fig_conc = px.bar(
+            conc_data, x='Insomnia_Category', y='value', color='ConcentrationDifficulty',
+            barmode='group', title='Concentration Difficulty by Insomnia Category',
+            category_orders={"ConcentrationDifficulty": frequency_order, "Insomnia_Category": insomnia_order},
+            color_discrete_sequence=px.colors.sequential.Sunset,
+            labels={'value': 'Number of Students'}
+        )
+        st.plotly_chart(fig_conc, use_container_width=True)
 
-# 3. Create the Plotly Grouped Bar Chart
-fig2 = px.bar(
-    concentration_melted,
-    x='Insomnia_Category',
-    y='Count',
-    color='ConcentrationDifficulty',
-    barmode='group',  # This creates the "grouped" effect instead of stacked
-    title='Concentration Difficulty by Insomnia Category',
-    category_orders={
-        "ConcentrationDifficulty": concentration_difficulty_order,
-        "Insomnia_Category": insomnia_category_order
-    },
-    color_discrete_sequence=px.colors.sequential.Sunset,
-    labels={'Count': 'Number of Students', 'Insomnia_Category': 'Insomnia Level'}
-)
+    with col4:
+        # Stacked Bar: Daytime Fatigue
+        fatigue_data = pd.crosstab(df['Insomnia_Category'], df['DaytimeFatigue'], dropna=False).reset_index().melt(id_vars='Insomnia_Category')
+        fig_fatigue = px.bar(
+            fatigue_data, x='Insomnia_Category', y='value', color='DaytimeFatigue',
+            barmode='stack', title="Fatigue Level by Insomnia Severity",
+            category_orders={"DaytimeFatigue": frequency_order, "Insomnia_Category": insomnia_order},
+            color_discrete_sequence=px.colors.sequential.Sunset,
+            labels={'value': 'Number of Students'}
+        )
+        st.plotly_chart(fig_fatigue, use_container_width=True)
 
-fig2.update_layout(
-    legend_title_text='Concentration Difficulty',
-    xaxis_title="Insomnia Category",
-    yaxis_title="Number of Students"
-)
+    # Assignment Impact (Full Width Stacked Bar)
+    assign_data = pd.crosstab(df["Insomnia_Category"], df["AssignmentImpact"], dropna=False).reset_index().melt(id_vars='Insomnia_Category')
+    fig_assign = px.bar(
+        assign_data, x='Insomnia_Category', y='value', color='AssignmentImpact',
+        barmode='stack', title="Assignment Impact by Insomnia Category",
+        category_orders={"AssignmentImpact": impact_order, "Insomnia_Category": insomnia_order},
+        color_discrete_sequence=px.colors.sequential.Sunset,
+        labels={'value': 'Number of Students'}
+    )
+    st.plotly_chart(fig_assign, use_container_width=True)
 
-# 4. Display in Streamlit
-st.plotly_chart(fig2, use_container_width=True)
+# ==========================================
+# TAB 3: CORRELATIONS
+# ==========================================
+with tab3:
+    st.subheader("Statistical Correlation")
+    # Identify numerical columns for correlation matrix
+    corr_columns = [
+        'SleepHours_est', 'InsomniaSeverity_index', 'DaytimeFatigue_numeric',
+        'ConcentrationDifficulty_numeric', 'MissedClasses_numeric',
+        'AcademicPerformance_numeric', 'GPA_numeric', 'CGPA_numeric'
+    ]
+    existing_cols = [c for c in corr_columns if c in df.columns]
+    corr_matrix = df[existing_cols].corr()
 
-
-import streamlit as st
-import plotly.express as px
-
-# 1. Define the GPA order (if your GPA column contains categories like '2.0-2.5', etc.)
-# If GPA is a number, you can skip the 'category_orders' part.
-gpa_order = sorted(df['GPA'].unique()) 
-
-# 2. Create the Plotly Box Plot
-
-fig3 = px.box(
-    df,
-    x="GPA",
-    y="InsomniaSeverity_index",
-    color="GPA", # Gives each box a different color from the palette
-    title="Insomnia Severity Index Across GPA Categories",
-    category_orders={"GPA": gpa_order},
-    color_discrete_sequence=px.colors.sequential.Sunset, # Matches 'flare'
-    points="outliers" # Show outliers specifically (default) or use "all"
-)
-
-# 3. Clean up labels and layout
-fig3.update_layout(
-    xaxis_title="GPA Category",
-    yaxis_title="Insomnia Severity Index",
-    showlegend=False, # Hide legend since the X-axis already identifies the GPA
-    plot_bgcolor="rgba(0,0,0,0)" # Transparent background for a cleaner look
-)
-
-# 4. Display in Streamlit
-st.plotly_chart(fig3, use_container_width=True)
-
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-
-# 1. Define the ordering logic
-assignment_impact_order = ['No impact', 'Minor impact', 'Moderate impact', 'Major impact', 'Severe impact']
-insomnia_category_order = ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia']
-
-# 2. Prepare the data (Crosstab to Melted format)
-assignment_table = pd.crosstab(
-    df["Insomnia_Category"], 
-    df["AssignmentImpact"],
-    dropna=False
-)
-assignment_melted = assignment_table.reset_index().melt(
-    id_vars='Insomnia_Category', 
-    var_name='AssignmentImpact', 
-    value_name='Student_Count'
-)
-
-# 3. Create the Plotly Stacked Bar Chart
-fig4 = px.bar(
-    assignment_melted,
-    x='Insomnia_Category',
-    y='Student_Count',
-    color='AssignmentImpact',
-    title="Assignment Impact by Insomnia Category",
-    category_orders={
-        "AssignmentImpact": assignment_impact_order,
-        "Insomnia_Category": insomnia_category_order
-    },
-    color_discrete_sequence=px.colors.sequential.Sunset, # Closest match to 'flare'
-    labels={'Student_Count': 'Number of Students', 'Insomnia_Category': 'Insomnia Level'}
-)
-
-# 4. Refine layout (matches your plt.legend logic)
-fig4.update_layout(
-    barmode='stack', # This ensures the bars are stacked
-    xaxis_title="Insomnia Category",
-    yaxis_title="Number of Students",
-    legend_title_text='Assignment Impact'
-)
-
-# 5. Display in Streamlit
-st.plotly_chart(fig4, use_container_width=True)
-
-# Prepare Data
-daytime_fatigue_order = ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
-fatigue_table = pd.crosstab(df['Insomnia_Category'], df['DaytimeFatigue'], dropna=False)
-fatigue_melted = fatigue_table.reset_index().melt(id_vars='Insomnia_Category', var_name='DaytimeFatigue', value_name='Count')
-
-# Plot
-fig5 = px.bar(
-    fatigue_melted,
-    x='Insomnia_Category',
-    y='Count',
-    color='DaytimeFatigue',
-    title="Fatigue Level by Insomnia Severity",
-    category_orders={"DaytimeFatigue": daytime_fatigue_order},
-    color_discrete_sequence=px.colors.sequential.Sunset,
-    barmode='stack'
-)
-st.plotly_chart(fig5, use_container_width=True)
-
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-
-# 1. Pastikan urutan kategori adalah tepat (Excellent di atas, Below Average di bawah)
-# Kita susun begini supaya dalam graf, Excellent berada di kedudukan tertinggi paksi-Y
-academic_order = ['Below average', 'Average', 'Good', 'Very good', 'Excellent']
-insomnia_order = ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia']
-
-# 2. Tukar data kepada kategori (Penting untuk susunan paksi)
-df['AcademicPerformance'] = pd.Categorical(
-    df['AcademicPerformance'], 
-    categories=academic_order, 
-    ordered=True
-)
-
-# 3. Gunakan px.box (BUKAN px.histogram atau px.bar)
-fig = px.box(
-    df,
-    x='Insomnia_Category',
-    y='AcademicPerformance',
-    color='Insomnia_Category',
-    title="Academic Performance by Insomnia Severity",
-    # category_orders memastikan Excellent di atas dan Below Average di bawah
-    category_orders={
-        "AcademicPerformance": academic_order,
-        "Insomnia_Category": insomnia_order
-    },
-    color_discrete_sequence=px.colors.sequential.Sunset,
-    points="outliers" 
-)
-
-# 4. Laraskan Layout supaya serupa dengan Colab
-fig.update_layout(
-    xaxis_title="Insomnia Severity",
-    yaxis_title="Academic Performance (GPA / Self-rated)",
-    showlegend=False,
-    # Memaksa paksi-Y mengikut urutan kategori yang kita tetapkan
-    yaxis=dict(autorange="reversed") 
-)
-
-st.plotly_chart(fig, use_container_width=True)
-
-
-
-
-
-
-
-
-# Select columns and calculate matrix
-corr_columns = [
-    'SleepHours_est', 'InsomniaSeverity_index', 'DaytimeFatigue_numeric',
-    'ConcentrationDifficulty_numeric', 'MissedClasses_numeric',
-    'AcademicPerformance_numeric', 'GPA_numeric', 'CGPA_numeric'
-]
-# Ensure we only use columns that exist in df
-existing_cols = [c for c in corr_columns if c in df.columns]
-corr_matrix = df[existing_cols].corr()
-
-# Create Heatmap
-fig7 = px.imshow(
-    corr_matrix,
-    text_auto=".2f", # Adds the numbers inside the squares
-    aspect="auto",
-    color_continuous_scale='Sunset', # Matches 'flare'
-    title="Correlation Heatmap: Sleep Issues vs. Academic Outcomes"
-)
-st.plotly_chart(fig7, use_container_width=True)
+    # Heatmap visualization
+    fig_heat = px.imshow(
+        corr_matrix, text_auto=".2f", aspect="auto",
+        color_continuous_scale='Sunset',
+        title="Correlation Heatmap: Sleep Issues vs. Academic Outcomes"
+    )
+    st.plotly_chart(fig_heat, use_container_width=True)
