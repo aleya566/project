@@ -153,3 +153,53 @@ fig4.update_layout(
 
 # 5. Display in Streamlit
 st.plotly_chart(fig4, use_container_width=True)
+
+# Prepare Data
+daytime_fatigue_order = ['Never', 'Rarely', 'Sometimes', 'Often', 'Always']
+fatigue_table = pd.crosstab(df['Insomnia_Category'], df['DaytimeFatigue'], dropna=False)
+fatigue_melted = fatigue_table.reset_index().melt(id_vars='Insomnia_Category', var_name='DaytimeFatigue', value_name='Count')
+
+# Plot
+fig5 = px.bar(
+    fatigue_melted,
+    x='Insomnia_Category',
+    y='Count',
+    color='DaytimeFatigue',
+    title="Fatigue Level by Insomnia Severity",
+    category_orders={"DaytimeFatigue": daytime_fatigue_order},
+    color_discrete_sequence=px.colors.sequential.Sunset,
+    barmode='stack'
+)
+st.plotly_chart(fig5, use_container_width=True)
+
+fig6 = px.box(
+    df,
+    x='Insomnia_Category',
+    y='AcademicPerformance',
+    color='Insomnia_Category',
+    title="Academic Performance by Insomnia Severity",
+    color_discrete_sequence=px.colors.sequential.Sunset,
+    points="outliers"
+)
+fig6.update_layout(showlegend=False)
+st.plotly_chart(fig6, use_container_width=True)
+
+# Select columns and calculate matrix
+corr_columns = [
+    'SleepHours_est', 'InsomniaSeverity_index', 'DaytimeFatigue_numeric',
+    'ConcentrationDifficulty_numeric', 'MissedClasses_numeric',
+    'AcademicPerformance_numeric', 'GPA_numeric', 'CGPA_numeric'
+]
+# Ensure we only use columns that exist in df
+existing_cols = [c for c in corr_columns if c in df.columns]
+corr_matrix = df[existing_cols].corr()
+
+# Create Heatmap
+fig7 = px.imshow(
+    corr_matrix,
+    text_auto=".2f", # Adds the numbers inside the squares
+    aspect="auto",
+    color_continuous_scale='Sunset', # Matches 'flare'
+    title="Correlation Heatmap: Sleep Issues vs. Academic Outcomes"
+)
+st.plotly_chart(fig7, use_container_width=True)
