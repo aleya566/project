@@ -7,7 +7,7 @@ import numpy as np
 # 1. PAGE CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="🧠 Interpretation Dashboard: Impact of Sleep Related Issues on Academic Performance", 
+    page_title="Interpretation Dashboard: Impact of Sleep Related Issues on Academic Performance", 
     layout="wide"
 )
 
