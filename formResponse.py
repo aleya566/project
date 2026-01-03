@@ -37,9 +37,65 @@ def load_data():
 df, academic_order, insomnia_order, freq_order, impact_order = load_data()
 
 # ==========================================
-# 3. DASHBOARD CONTENT (ORIGINAL LAYOUT)
+# 3. DASHBOARD HEADER
 # ==========================================
 st.title("Interpretation Dashboard: Impact of Sleep Related Issues on Academic Performance")
+
+# ==============================================
+# 🔹 KEY METRICS SECTION (Objective-Driven)
+# ==============================================
+st.subheader("Key Findings: The Impact of Insomnia")
+col1, col2, col3, col4 = st.columns(4)
+
+# Filtering data to isolate the high-impact group for metrics
+severe_insomnia_df = df[df['Insomnia_Category'] == 'Severe Insomnia']
+
+# A. Focus Risk (Concentration Difficulty)
+focus_risk = (severe_insomnia_df['ConcentrationDifficulty'].isin(['Often', 'Always']).mean() * 100)
+
+# B. Fatigue Impact (Daytime Fatigue)
+fatigue_impact = (severe_insomnia_df['DaytimeFatigue'].isin(['Often', 'Always']).mean() * 100)
+
+# C. Performance Trend (Most common performance for Severe group)
+perf_impact = severe_insomnia_df['AcademicPerformance'].mode()[0] if not severe_insomnia_df.empty else "N/A"
+
+# D. Assignment Risk (Percentage reporting Major/Severe impact)
+assign_impact = (severe_insomnia_df['AssignmentImpact'].isin(['Major impact', 'Severe impact']).mean() * 100)
+
+# Display metrics in cards
+col1.metric(
+    label="🧠 Concentration Risk", 
+    value=f"{focus_risk:.1f}%", 
+    help="Severe insomniacs who struggle to focus often/always",
+    border=True
+) 
+
+col2.metric(
+    label="😫 Extreme Fatigue", 
+    value=f"{fatigue_impact:.1f}%", 
+    help="Severe insomniacs reporting frequent daytime fatigue",
+    border=True
+) 
+
+col3.metric(
+    label="📉 Performance Trend", 
+    value=perf_impact, 
+    help="Most common academic performance level for students with severe insomnia",
+    border=True
+) 
+
+col4.metric( 
+    label="📝 Assignment Risk", 
+    value=f"{assign_impact:.1f}%", 
+    help="Severe insomniacs reporting major/severe impact on assignments",
+    border=True
+)
+
+st.divider()
+
+# ==========================================
+# 4. VISUALIZATIONS (ORIGINAL LAYOUT)
+# ==========================================
 
 # --- CHART 1: Concentration Difficulty (Grouped Bar) ---
 concentration_crosstab = pd.crosstab(df['Insomnia_Category'], df['ConcentrationDifficulty'], dropna=False)
