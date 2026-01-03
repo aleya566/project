@@ -173,43 +173,47 @@ fig5 = px.bar(
 st.plotly_chart(fig5, use_container_width=True)
 
 import streamlit as st
+import pandas as pd
 import plotly.express as px
 
-# 1. Susunan kategori (ikut urutan Colab anda: Below average di atas)
+# 1. Pastikan urutan kategori adalah tepat (Excellent di atas, Below Average di bawah)
+# Kita susun begini supaya dalam graf, Excellent berada di kedudukan tertinggi paksi-Y
 academic_order = ['Below average', 'Average', 'Good', 'Very good', 'Excellent']
 insomnia_order = ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia']
 
-# 2. Bina Boxplot
-fig6 = px.box(
+# 2. Tukar data kepada kategori (Penting untuk susunan paksi)
+df['AcademicPerformance'] = pd.Categorical(
+    df['AcademicPerformance'], 
+    categories=academic_order, 
+    ordered=True
+)
+
+# 3. Gunakan px.box (BUKAN px.histogram atau px.bar)
+fig = px.box(
     df,
     x='Insomnia_Category',
     y='AcademicPerformance',
-    color='Insomnia_Category', # Memberi warna solid pada kotak
+    color='Insomnia_Category',
     title="Academic Performance by Insomnia Severity",
+    # category_orders memastikan Excellent di atas dan Below Average di bawah
     category_orders={
         "AcademicPerformance": academic_order,
         "Insomnia_Category": insomnia_order
     },
-    # Gunakan palet warna yang lebih dekat dengan Seaborn 'flare'
-    color_discrete_sequence=px.colors.sequential.RdPu_r, 
-    points="outliers"
+    color_discrete_sequence=px.colors.sequential.Sunset,
+    points="outliers" 
 )
 
-# 3. Penyelarasan Layout (Kritikal untuk rupa yang sama)
-fig6.update_layout(
+# 4. Laraskan Layout supaya serupa dengan Colab
+fig.update_layout(
     xaxis_title="Insomnia Severity",
     yaxis_title="Academic Performance (GPA / Self-rated)",
     showlegend=False,
-    # Mengecilkan lebar kotak supaya ada ruang di antara mereka
-    boxgap=0.5, 
-    # Memastikan paksi Y tidak terbalik secara automatik
-    yaxis=dict(autorange="reversed") if df['AcademicPerformance'].iloc[0] == 'Excellent' else None
+    # Memaksa paksi-Y mengikut urutan kategori yang kita tetapkan
+    yaxis=dict(autorange="reversed") 
 )
 
-# 4. Tambah garisan kotak yang lebih jelas
-fig6.update_traces(marker_size=4, line_width=2)
-
-st.plotly_chart(fig6, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 # Select columns and calculate matrix
 corr_columns = [
