@@ -178,7 +178,7 @@ import plotly.express as px
 
 # 1. Pastikan urutan kategori adalah tepat (Excellent di atas, Below Average di bawah)
 # Kita susun begini supaya dalam graf, Excellent berada di kedudukan tertinggi paksi-Y
-academic_order = ['Excellent', 'Very good', 'Good', 'Average', 'Below average']
+academic_order = ['Below average', 'Average', 'Good', 'Very good', 'Excellent']
 insomnia_order = ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia']
 
 # 2. Tukar data kepada kategori (Penting untuk susunan paksi)
