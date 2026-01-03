@@ -17,26 +17,7 @@ df = load_data()
 # Title for the Streamlit App
 st.title("Student Health Analysis")
 
-# Create the Plotly figure
-# 'flare' is a sequential palette; px.colors.sequential.Sunset or RdPu are close matches
-fig = px.histogram(
-    df, 
-    x='Insomnia_Category', 
-    color='Insomnia_Category',
-    title="Distribution of Insomnia Severity among Students",
-    labels={'Insomnia_Category': 'Insomnia Severity', 'count': 'Number of Students'},
-    color_discrete_sequence=px.colors.sequential.Sunset  # Matches the 'flare' aesthetic
-)
 
-# Optional: Improve layout to match Seaborn's default clean look
-fig.update_layout(
-    xaxis_title="Insomnia Severity",
-    yaxis_title="Number of Students",
-    showlegend=False
-)
-
-# Display in Streamlit
-st.plotly_chart(fig, use_container_width=True)
 
 
 import streamlit as st
