@@ -173,34 +173,34 @@ fig5 = px.bar(
 st.plotly_chart(fig5, use_container_width=True)
 
 import streamlit as st
-import plotly.express as px
 import pandas as pd
+import plotly.express as px
 
-# 1. Takrifkan susunan kategori yang tepat
+# 1. Tentukan susunan yang dikehendaki (bawah ke atas)
 academic_order = ['Below Average', 'Average', 'Good', 'Very Good', 'Excellent']
 insomnia_order = ['Low / No Insomnia', 'Moderate Insomnia', 'Severe Insomnia']
 
-# 2. Tukar data kepada jenis Categorical supaya urutan kekal konsisten
+# 2. Tukar data kepada kategori supaya Pandas faham susunannya
 df['AcademicPerformance'] = pd.Categorical(
     df['AcademicPerformance'], 
     categories=academic_order, 
     ordered=True
 )
 
-# 3. Bina Boxplot menggunakan Plotly Express
+# 3. Bina Boxplot menggunakan Plotly
 fig6 = px.box(
     df,
     x='Insomnia_Category',
     y='AcademicPerformance',
     color='Insomnia_Category',
-    title="Academic Performance vs Insomnia Severity",
-    # Gunakan category_orders untuk memaksa susunan pada paksi
+    title="Academic Performance by Insomnia Severity",
+    # category_orders memastikan Plotly mengikut susunan kita, bukan susunan abjad
     category_orders={
         "AcademicPerformance": academic_order,
         "Insomnia_Category": insomnia_order
     },
-    color_discrete_sequence=px.colors.sequential.Sunset, # Warna mirip 'flare'
-    points="outliers" # Tunjukkan titik bagi data pencilan
+    color_discrete_sequence=px.colors.sequential.Sunset, # Warna seakan 'flare'
+    points="outliers" # Menunjukkan titik bagi data ekstrem
 )
 
 # 4. Kemaskan label paksi
@@ -208,10 +208,10 @@ fig6.update_layout(
     xaxis_title="Insomnia Severity",
     yaxis_title="Academic Performance (Self-rated)",
     showlegend=False,
-    yaxis=dict(type='category') # Memastikan paksi-Y melayan data sebagai kategori
+    yaxis=dict(type='category') # Memastikan paksi-Y melayan teks sebagai kategori
 )
 
-# 5. Paparkan dalam Streamlit
+# 5. Paparkan di Streamlit
 st.plotly_chart(fig6, use_container_width=True)
 
 # Select columns and calculate matrix
