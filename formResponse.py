@@ -39,7 +39,7 @@ df, academic_order, insomnia_order, freq_order, impact_order = load_data()
 # ==========================================
 # 3. DASHBOARD CONTENT (ORIGINAL LAYOUT)
 # ==========================================
-st.title("Student Health Analysis")
+st.title("Interpretation Dashboard: Impact of Sleep Related Issues on Academic Performance")
 
 # --- CHART 1: Concentration Difficulty (Grouped Bar) ---
 concentration_crosstab = pd.crosstab(df['Insomnia_Category'], df['ConcentrationDifficulty'], dropna=False)
