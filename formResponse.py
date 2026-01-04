@@ -118,7 +118,7 @@ st.markdown("""
 * Zero (0) students reported "Never" experiencing concentration issues, proving that focus is a universal challenge, but it becomes chronic with poor sleep.
 
 **Conclusion**
-There is a direct relationship between insomnia severity and difficulty maintaining focus. Severe insomnia doesn't just mean less sleep but it creates a high risk of academic failure due to ongoing cognitive impairment.
+* There is a direct relationship between insomnia severity and difficulty maintaining focus. Severe insomnia doesn't just mean less sleep but it creates a high risk of academic failure due to ongoing cognitive impairment.
 """)
 st.divider()
 
@@ -142,7 +142,7 @@ st.markdown("""
 * GPA 2.50 - 2.49 group show highest spread and maximum scores (reaching 14), indicating that this group experiences the strongest insomnia symptoms.
 
 **Conclusion**
-Managing insomnia is a key factor in academic success. Students with the best grades tend to maintain the healthiest sleep profiles.
+* Managing insomnia is a key factor in academic success. Students with the best grades tend to maintain the healthiest sleep profiles.
 """)
 st.divider()
 
@@ -167,7 +167,7 @@ st.markdown("""
 * Severe Insomnia: Negative impact is the standard.16 out of 21 students are "Moderate" or "Major" impacted, with only 1 student reporting "No impact".
 
 **Conclusion**
-The insomnia severity is directly correlates with academic disruption. As sleep health worsens, the ability to complete coursework effectively is significantly compromised.
+* The insomnia severity is directly correlates with academic disruption. As sleep health worsens, the ability to complete coursework effectively is significantly compromised.
 """)
 st.divider()
 
@@ -191,7 +191,7 @@ st.markdown("""
 * Severe Insomnia: Fatigue is nearly universal. 20 out of 21 students reported fatigue "Sometimes" to "Always".
 
 **Conclusion**
-There is a progressive increase in fatigue associated with sleep health. Fatigue acts as a barrier that may drive the concentration and performance issues seen throughout this study.
+* There is a progressive increase in fatigue associated with sleep health. Fatigue acts as a barrier that may drive the concentration and performance issues seen throughout this study.
 """)
 st.divider()
 
@@ -213,7 +213,7 @@ st.markdown("""
 * Severe Insomnia shifts the entire box down to "Average" and "Good," with almost no representation of "Very good".
 
 **Conclusion**
-Insomnia severity has a negative correlation with academic self perception. Severe insomnia acts as a "ceiling" that makes it harder to achieve or feel like a high achiever.
+* Insomnia severity has a negative correlation with academic self perception. Severe insomnia acts as a "ceiling" that makes it harder to achieve or feel like a high achiever.
 """)
 st.divider()
 
@@ -237,5 +237,5 @@ st.markdown("""
 * The small positive correlation (0.14) between sleep hours and fatigue suggests that getting more sleep doesn't always solve the problem.
 
 **Conclusion**
-While sleep health determines student experience (fatigue/focus), its relationship to actual grades is complex. Success is more threatened by behavioral consequences (missing class) than just feeling tired.
+* While sleep health determines student experience (fatigue/focus), its relationship to actual grades is complex. Success is more threatened by behavioral consequences (missing class) than just feeling tired.
 """)
